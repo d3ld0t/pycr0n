@@ -70,10 +70,9 @@ def poll():
             midiout(note=note,velocity=127,channel=12,device=yoke3)
         elif (note > 15 and note < 24):
             if velocity < 64:
-                midiout(note=note,velocity = 2*velocity,channel=12,device=yoke3)
+                midiout(note=note+56,velocity = 2*velocity,channel=12,device=yoke3)
             else:
-                midiout(note=note,velocity= (velocity - 64)*2,channel=12,device=yoke3)
-        
+                midiout(note=note+64,velocity= (velocity - 64)*2,channel=12,device=yoke3)
         else:
             midiout(note=note,velocity=velocity,channel=12,device=yoke3)
 
