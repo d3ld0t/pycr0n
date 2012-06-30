@@ -14,7 +14,10 @@ for i in xrange(8):
 
 def poll():
     global sparsity
+    seen_stuff = False
+
     if launchpad_in.poll():
+        seen_stuff = True
         data = launchpad_in.read(1)
         control = data[0][0][0]
         note = data[0][0][1]
@@ -31,6 +34,7 @@ def poll():
 
 
     if gradient.parent.poll():
+        seen_stuff = True
         data = gradient.parent.recv()
         print data
         if data[0] == 8:
@@ -54,6 +58,7 @@ def poll():
     # trackleft trackright 58-59
 
     if nanokontrol_in.poll():
+        seen_stuff = True
         data = nanokontrol_in.read(1)
         note = data[0][0][1]
         velocity = data[0][0][2]
@@ -70,18 +75,24 @@ def poll():
     #global lt.pad_state, lt.axis2_state
     pygame.event.pump()
     if pygame.event.peek(pygame.JOYBUTTONDOWN):
+        seen_stuff = True
         pygame.event.clear()
         for i in xrange(12):
             if lt.logitech_in.get_button(i):
                 if i == 0:
                     midiout(note=0,velocity=127,channel=13,device=yoke3)
     if pygame.event.peek(pygame.JOYBUTTONUP):
+        seen_stuff = True
         pygame.event.clear()
         print "pushUP!",lt.logitech_in.get_button(0)
+
     if pygame.event.peek(pygame.JOYHATMOTION):
+        seen_stuff = True
         pygame.event.clear()
         print "left stick!",lt.logitech_in.get_hat(0)
+
     if pygame.event.peek(pygame.JOYAXISMOTION):
+        seen_stuff = True
         tmp1 = lt.logitech_in.get_axis(0)
         tmp2 = lt.logitech_in.get_axis(2)/8
         pygame.event.clear()
@@ -92,3 +103,5 @@ def poll():
             lt.axis3_state = tmp2
             launchpad.push_params(lt.axis2_state + lt.axis3_state)
 
+
+    return seen_stuff
