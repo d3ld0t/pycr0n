@@ -1,3 +1,6 @@
+
+import config
+
 from gradient import parent
 import random
 from config import *
@@ -9,6 +12,7 @@ green = 48
 red = 3
 
 buttons = []
+
 
 for x in xrange(64):
     buttons.append([0,[]])
@@ -28,8 +32,8 @@ def set(position, state):
         rand_param(buttons[position][1])
         if buttons[position][0] == 0:
             buttons[position][0] = 1
-            parent.send([position,'on'])
             midiout(note=position,velocity=127,device=yoke8) # Order matters
+            parent.send([position,'on'])
             launchpad_out.note_on(position/8*16 + position%8,48,0)
     if not state:
         if buttons[position][0] == 1:
@@ -38,7 +42,6 @@ def set(position, state):
             buttons[position][0] = 0
             parent.send([position,'off'])
         
-        midiout(note=position,velocity=0,device=yoke8) # Order matters
         launchpad_out.note_on(position/8*16 + position%8,0,0)
         
 
@@ -59,7 +62,17 @@ def toggle(note):
         buttons[position][0] = 0
         launchpad_out.note_on(note,0,0)
         parent.send([position,'off'])
-        midiout(note=position,velocity=0,device=yoke8,channel=0)
+
+def flash(note,color,flag):
+    """
+    makes note on pad flash color
+    """
+    if flag == 'on': 
+        launchpad_out.write_short(0xB0,0x00,0x28)
+        launchpad_out.write_short(0xB0,0x6f,red + green + 8)
+    elif flag == 'off': 
+        launchpad_out.write_short(0xB0,0x00,0x20)
+        launchpad_out.write_short(0xB0,0x6f,0)
 
 def clear(row):
     for x in range(8):
@@ -71,7 +84,7 @@ def rand(row):
     '''
     random.seed()
     for x in range(8):
-        set(x+row*8,int(round(random.uniform(0,1 - sparsity/2))))
+        set(x+row*8,int(round(random.uniform(0,1 - config.sparsity/2))))
 
 def rand_all():
     for x in range(8):

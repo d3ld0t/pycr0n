@@ -11,5 +11,9 @@ if joystick.get_init():
     print logitech_in.get_name(), " initialized...","\n"
 
 pad_state = (0,0)
+axis_button_state = 'off'
+start_axis = 0.0
+old_axis = 0.0
+axis_state = 0
 axis2_state = 0    
 axis3_state = 0

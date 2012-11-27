@@ -1,6 +1,7 @@
 from math import *
 import random
 from pygame import midi
+from pygame import joystick
 #from launchpad import buttons
 
 def midiout(device,note=0,velocity=127,channel=0):                          
@@ -14,19 +15,32 @@ sparsity_param = 0.0
 # Initialize Devices
 print "Initializing Devices..."
 
+# Device Bools
+nanokontrol_set = False
+launchpad_set = False
+remotesl_set = False
+if joystick.get_init() and joystick.get_count() > 0: joystick_set = True
+else: joystick_set = False
+     
+
+
 # MIDI config
 for x in range(midi.get_count()):
     dev_info = midi.get_device_info(x)
     print x, dev_info
     if 'Launchpad' in dev_info[1] and dev_info[2]:
         launchpad_in = midi.Input(x)
+        launchpad_set = True
     elif 'Launchpad' in dev_info[1] and not dev_info[2]:
         launchpad_out = midi.Output(x)
+        launchpad_set = True
     elif 'nanoKONTROL2' in dev_info[1] and dev_info[2]:
         nanokontrol_in = midi.Input(x)
+        nanokontrol_set = True
         print "nanoKONTROL set"
     elif 'MIDIIN3' in dev_info[1] and 'ReMOTE ZeRO SL' in dev_info[1]:
         remotesl_in = midi.Input(x)
+        remotesl_set = True
         print "RemoteSL Input set"
     elif 'loopMIDI Port 1' in dev_info[1] and not dev_info[2]:
         yoke1 = midi.Output(x)
@@ -37,9 +51,9 @@ for x in range(midi.get_count()):
     elif 'loopMIDI Port 3' in dev_info[1] and not dev_info[2]:
         yoke3 = midi.Output(x)
         print "Yoke 3 discovered"
-    elif 'loopMIDI Port 6' in dev_info[1] and not dev_info[2]:
-        yoke6 = midi.Output(x)
-        print "Yoke 6 discovered"
+    elif 'loopMIDI Port 4' in dev_info[1] and not dev_info[2]:
+        yoke4 = midi.Output(x)
+        print "Yoke 4 discovered"
     elif 'loopMIDI Port 7' in dev_info[1] and not dev_info[2]:
         yoke7 = midi.Output(x)
         print "Yoke 7 discovered"
@@ -68,6 +82,7 @@ class ParamState():
         print "push!"
 
 def rand_param(ia):                                                  
+    global sparsity_param
     '''
     Cellular Automata? Random primes? Based on B0ner theory?
     Randomizes which parameters on the specified rack become                # Here is where we can get creative.  If we need to make it deterministic, so be it
