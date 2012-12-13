@@ -24,6 +24,7 @@ armed = []
 for x in xrange(8):
     armed.append(0)
 
+
 def set(position, state):
     '''
     Set the button on the Launchpad in position (0-63) to the state 0 (off) or 1 (on)
@@ -69,7 +70,7 @@ def flash(note,color,flag):
     """
     if flag == 'on': 
         launchpad_out.write_short(0xB0,0x00,0x28)
-        launchpad_out.write_short(0xB0,0x6f,red + green + 8)
+        launchpad_out.write_short(0xB0,0x6f,color + 8)
     elif flag == 'off': 
         launchpad_out.write_short(0xB0,0x00,0x20)
         launchpad_out.write_short(0xB0,0x6f,0)

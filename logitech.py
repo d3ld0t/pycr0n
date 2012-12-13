@@ -12,8 +12,12 @@ if joystick.get_init():
 
 pad_state = (0,0)
 axis_button_state = 'off'
+axis_button_state2 = 'off'
 start_axis = 0.0
 old_axis = 0.0
 axis_state = 0
-axis2_state = 0    
-axis3_state = 0
+start_axis2 = 0.0
+old_axis2 = 0.0
+axis_state2 = 0
+axis2_state2 = 0    
+axis3_state2 = 0

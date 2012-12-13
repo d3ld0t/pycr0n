@@ -35,7 +35,6 @@ class RampState():
             self.start_time = now
             self.current_progress = max(min(self.current_progress, 1), 0) # Clamp to [0,1]
             midiout(yoke4,self.position,int(floor(self.current_progress*127)),11)
-            print int(floor(self.current_progress*127)),self.current_progress
         else:
             self.current_progress = self.current_progress - ((now - self.start_time)/duration)
             self.start_time = now
@@ -57,25 +56,12 @@ if remotesl_set:
         SLEEP_TIME = 0.050
         while True:                         # Loop constantly
 
-            if remotesl_in.poll():
-                remotesl_data = remotesl_in.read(1)
-                sl_control = remotesl_data[0][0][1]
-                sl_value = remotesl_data[0][0][2]
-
-                midiout(velocity=sl_value,note=sl_control,channel=9,device=yoke4)
-
-                if sl_control == 9:         # Duration
-                    duration = 8.0*(sl_value + offset)/(127 + offset)
-
-                elif sl_control == 8:       # Sparsity
-                    conn.send((8,float(sl_value)/127))
-
-                elif (sl_control > 23 and sl_control < 32): # Butter/No butter
-                    conn.send((sl_control,sl_value))
                 
             if conn.poll():
                 tmp = conn.recv()           # tmp[0] is note, tmp[1] is new state in string form
-                if tmp[1]=='on':
+                if tmp[1] == 'duration':
+                    duration = tmp[0] 
+                elif tmp[1]=='on':
 
                     found_yet = False                
                     for j in active_ramps:

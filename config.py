@@ -2,6 +2,9 @@ from math import *
 import random
 from pygame import midi
 from pygame import joystick
+
+midi_mode = False
+
 #from launchpad import buttons
 
 def midiout(device,note=0,velocity=127,channel=0):                          
@@ -31,13 +34,19 @@ for x in range(midi.get_count()):
     if 'Launchpad' in dev_info[1] and dev_info[2]:
         launchpad_in = midi.Input(x)
         launchpad_set = True
+	print "Launchpad In set"
     elif 'Launchpad' in dev_info[1] and not dev_info[2]:
         launchpad_out = midi.Output(x)
         launchpad_set = True
+	print "Launchpad Out set"
     elif 'nanoKONTROL2' in dev_info[1] and dev_info[2]:
         nanokontrol_in = midi.Input(x)
         nanokontrol_set = True
         print "nanoKONTROL set"
+    elif 'nanoKEY' in dev_info[1] and dev_info[2]:
+        nanokey_in = midi.Input(x)
+        nanokey_set = True
+        print "nanoKEY set"
     elif 'MIDIIN3' in dev_info[1] and 'ReMOTE ZeRO SL' in dev_info[1]:
         remotesl_in = midi.Input(x)
         remotesl_set = True
@@ -52,7 +61,7 @@ for x in range(midi.get_count()):
         yoke3 = midi.Output(x)
         print "Yoke 3 discovered"
     elif 'loopMIDI Port 4' in dev_info[1] and not dev_info[2]:
-        yoke4 = midi.Output(x)
+        yoke4 = midi.Output(x,latency=1)
         print "Yoke 4 discovered"
     elif 'loopMIDI Port 7' in dev_info[1] and not dev_info[2]:
         yoke7 = midi.Output(x)
@@ -79,7 +88,6 @@ class ParamState():
     def push_out(self,x):
         return int(round(127*(self.sin_amt*sin(self.sin_freq*x + self.sin_phase) + 
                self.cos_amt*cos(self.cos_freq*x + self.cos_phase))))
-        print "push!"
 
 def rand_param(ia):                                                  
     global sparsity_param
@@ -102,4 +110,15 @@ def rand_param(ia):
             ia[i][1].cos_phase = random.uniform(0.0,2*pi)
         else:
             ia[i][0] = 0
+
+def rand_param_val(note,ia):
+    for i in xrange(8):
+        ia[i][1].sin_amt = random.uniform(0.0,1.0)
+        ia[i][1].cos_amt = 1.0-ia[i][1].sin_amt
+        ia[i][1].sin_freq = random.randint(1,max_freq)*pi
+        ia[i][1].cos_freq = random.randint(1,max_freq)*pi
+        ia[i][1].sin_phase = random.uniform(0.0,2*pi)
+        ia[i][1].cos_phase = random.uniform(0.0,2*pi)
+        midiout(device=yoke7, note=i + note*8 - (note/8)*64,
+                velocity=ia[i][1].push_out(random.uniform(0.0,1.0)),channel=(note/8)+1)
 
