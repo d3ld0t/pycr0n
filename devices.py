@@ -23,6 +23,7 @@ if config.joystick_set: import logitech as lt
 rand_mode = 'off'
 sample_mode = 'off'
 note_state = "off"
+sample_off_queue = []
 
 buttondown = 10
 buttonup = 11
@@ -138,13 +139,29 @@ def poll():
             else:
                 midiout(note=note,velocity=velocity,channel=12,device=yoke3)
 
-    """
-    if nanokey_in.poll():
-	data = nanokey_in.read(1)
-	print "nanokey",data
-	seen_stuff = True
+    if config.nanokey_set:
+        if nanokey_in.poll():
+            data = nanokey_in.read(1)
+            status = data[0][0][0]
+            note = data[0][0][1]
+            velocity = data[0][0][2]
+            channel = data[0][0][3]
+            timestamp = data[0][1]
+            max_time = 4000 #ms
+            if config.verbose: print "Velocity: %i note: %i status %i channel %i timestamp %i" \
+                    % (velocity,note,status,channel,timestamp)
 
-    """
+            if status == 144:
+                yoke4.write_short(144,note,127)
+                sample_off_queue.append([note,timestamp + int(random.uniform(0.0,1.0)*max_time)])
+       
+            seen_stuff = True
+
+        for item in sample_off_queue[:]: # a copy
+            if midi.time() > item[1]:
+                yoke4.write_short(128,item[0],64)
+                sample_off_queue.remove(item)
+
     if config.joystick_set: 
         
 

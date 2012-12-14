@@ -4,6 +4,7 @@ from pygame import midi
 from pygame import joystick
 
 midi_mode = False
+verbose = True
 
 #from launchpad import buttons
 
@@ -22,6 +23,7 @@ print "Initializing Devices..."
 nanokontrol_set = False
 launchpad_set = False
 remotesl_set = False
+nanokey_set = False
 if joystick.get_init() and joystick.get_count() > 0: joystick_set = True
 else: joystick_set = False
      
